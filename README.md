@@ -45,8 +45,8 @@
         }
    ```
 
-   **Hasil eksekusi:**
-    ![main.dart](img/main_dart.png)
+   **Hasil eksekusi:**  
+![main.dart](img/main_dart.png)
 
    Pada program tersebut, perulangan for menggunakan variabel i yang nilainya bertambah (increment) dari 0 sampai 9. Namun, bagian umur dituliskan sebagai ${18 - i}. Karena i terus         bertambah, hasil dari 18 - i justru menghasilkan nilai yang semakin kecil (18, 17, 16, ..., 9).
 
@@ -86,8 +86,8 @@
     }
  ```
 
-   **Output:**
-    ![NullSafety.dart](img/nullsafety.png)
+   **Hasil eksekusi:**  
+![NullSafety.dart](img/nullsafety.png)
 
    Sementara itu, `Late Variable` adalah cara mendeklarasikan variabel tanpa langsung memberi nilai awal, namun nilainya dipastikan akan diberikan kemudian sebelum digunakan. Kata kunci late biasanya dipakai pada variabel non-nullable yang belum bisa ditentukan nilainya saat deklarasi, tetapi kita yakin nilainya akan tersedia sebelum dipakai. Jika sebuah variabel late dipanggil sebelum diberi nilai, maka akan terjadi error pada runtime.
     **Contoh Kode:**
@@ -102,5 +102,6 @@
       }
    ```
 
-    **Output:**
-    ![LateVariabel.dart](img/latevariabel.png)
+  **Hasil eksekusi:**  
+![LateVariabel.dart](img/latevariabel.png)
+
