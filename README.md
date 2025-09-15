@@ -1,4 +1,4 @@
-# Codelab 03 - Pemrograman Mobile
+# Codelab 03 - Conditional and Loop
 
   * **Nama:** Rafi Ody Prasetyo
   * **NIM:** 2341720180
@@ -153,3 +153,4 @@
   ![praktikum3.dart](img/Praktikum3-perbaikan_langkah1.png)
 
   Perulangan dimulai dari `10` dikarenakan variabel `index` bernilai `10`. Perulangan akan berakhir ketika index bernilai 27.
+
