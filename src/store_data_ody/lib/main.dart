@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'model/pizza.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,11 +10,10 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter JSON Demo Rafi Ody P',
+      title: 'Flutter JSON Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const MyHomePage(),
     );
@@ -28,46 +28,65 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String pizzaString = '';
   List<Pizza> myPizzas = [];
+  int appCounter = 0; // Default 0
 
-  // Future readJsonFile() async {
   Future<List<Pizza>> readJsonFile() async {
     String myString = await DefaultAssetBundle.of(
       context,
     ).loadString('assets/pizzalist.json');
-    // P1 - 1
-    // setState(() {
-    //   pizzaString = myString;
-    // });
 
-    // P1 - 2
     List pizzaMapList = jsonDecode(myString);
-
     List<Pizza> myPizzas = [];
+
     for (var pizza in pizzaMapList) {
       Pizza myPizza = Pizza.fromJson(pizza);
       myPizzas.add(myPizza);
     }
 
-    // P1 - 3
-    String json = convertToJSON(myPizzas);
-    print(json);
-
     return myPizzas;
   }
 
-  String convertToJSON(List<Pizza> pizzas) {
-    return jsonEncode(pizzas.map((pizza) => jsonEncode(pizza)).toList());
+  // Fungsi untuk membaca dan menambah counter
+  Future readAndWritePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // 1. Ambil nilai lama (jika null anggap 0)
+    int savedValue = prefs.getInt('appCounter') ?? 0;
+
+    // 2. Tambah 1
+    int newValue = savedValue + 1;
+
+    // 3. Simpan nilai baru ke memori HP
+    await prefs.setInt('appCounter', newValue);
+
+    // 4. Update tampilan di layar
+    setState(() {
+      appCounter = newValue;
+    });
+  }
+
+  // Fungsi untuk mereset counter (Hapus Data)
+  Future deletePreference() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Menghapus semua data
+    setState(() {
+      appCounter = 0; // Reset variabel lokal ke 0
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    // readJsonFile();
+
+    // Panggil fungsi counter (Jalan sendiri update UI-nya)
+    readAndWritePreference();
+
+    // Panggil fungsi JSON
     readJsonFile().then((value) {
       setState(() {
         myPizzas = value;
+        // JANGAN update appCounter di sini, biarkan readAndWritePreference yang urus
       });
     });
   }
@@ -75,19 +94,23 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('JSON ODY')),
-      // body: Container(),
-      //P1 - 1
-      // body: Text(pizzaString),
-      //P1 - 2
-      body: ListView.builder(
-        itemCount: myPizzas.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(myPizzas[index].pizzaName),
-            subtitle: Text(myPizzas[index].description),
-          );
-        },
+      appBar: AppBar(title: const Text('Shared Preferences ODY')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              'You have opened the app $appCounter times.',
+              style: const TextStyle(fontSize: 18),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                deletePreference();
+              },
+              child: const Text('Reset Counter'),
+            ),
+          ],
+        ),
       ),
     );
   }
