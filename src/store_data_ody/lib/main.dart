@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'model/pizza.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart';
-import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,8 +11,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter JSON Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      title: 'Path Provider Ody',
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
       home: const MyHomePage(),
     );
   }
@@ -31,154 +26,60 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Pizza> myPizzas = [];
-  int appCounter = 0; // Default 0
-  String documentsPath = '';
-  String tempPath = '';
-  late File myFile;
-  String fileText = '';
+  final pwdController = TextEditingController();
+  String myPass = '';
+  final storage = const FlutterSecureStorage();
+  final myKey = 'myPass';
 
-  Future<List<Pizza>> readJsonFile() async {
-    String myString = await DefaultAssetBundle.of(
-      context,
-    ).loadString('assets/pizzalist.json');
-
-    List pizzaMapList = jsonDecode(myString);
-    List<Pizza> myPizzas = [];
-
-    for (var pizza in pizzaMapList) {
-      Pizza myPizza = Pizza.fromJson(pizza);
-      myPizzas.add(myPizza);
-    }
-
-    return myPizzas;
+  Future writeToSecureStorage() async {
+    await storage.write(key: myKey, value: pwdController.text);
   }
 
-  // Fungsi untuk membaca dan menambah counter
-  Future readAndWritePreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // 1. Ambil nilai lama (jika null anggap 0)
-    int savedValue = prefs.getInt('appCounter') ?? 0;
-
-    // 2. Tambah 1
-    int newValue = savedValue + 1;
-
-    // 3. Simpan nilai baru ke memori HP
-    await prefs.setInt('appCounter', newValue);
-
-    // 4. Update tampilan di layar
+  Future readFromSecureStorage() async {
+    String secret = await storage.read(key: myKey) ?? '';
     setState(() {
-      appCounter = newValue;
-    });
-  }
-
-  // Fungsi untuk mereset counter (Hapus Data)
-  Future deletePreference() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Menghapus semua data
-    setState(() {
-      appCounter = 0; // Reset variabel lokal ke 0
-    });
-  }
-
-  // Run di android
-  // Future getPaths() async {
-  //   final docDir = await getApplicationDocumentsDirectory();
-  //   final tempDir = await getTemporaryDirectory();
-  //   setState(() {
-  //     documentsPath = docDir.path;
-  //     tempPath = tempDir.path;
-  //   });
-  // }
-
-  // Untuk di run di PC
-  Future getPaths() async {
-    if (kIsWeb) {
-      setState(() {
-        documentsPath = "Tidak tersedia di Web";
-        tempPath = "Tidak tersedia di Web";
-      });
-      return;
-    }
-
-    final docDir = await getApplicationDocumentsDirectory();
-    final tempDir = await getTemporaryDirectory();
-    setState(() {
-      documentsPath = docDir.path;
-      tempPath = tempDir.path;
-    });
-  }
-
-  Future<bool> writeFile() async {
-    try {
-      await myFile.writeAsString('Margherita, Capricciosa, Napoli');
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  Future<bool> readFile() async {
-    try {
-      String fileContent = await myFile.readAsString();
-      setState(() {
-        fileText = fileContent;
-      });
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  @override
-  void initState() {
-    getPaths().then((_) {
-      myFile = File('$documentsPath/pizzas.txt');
-      writeFile();
-    });
-    super.initState();
-    // readAndWritePreference();
-
-    // Panggil fungsi JSON
-    readJsonFile().then((value) {
-      setState(() {
-        myPizzas = value;
-      });
+      myPass = secret;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: const Text('Shared Preferences ODY')),
-      // body: Center(
-      //   child: Column(
-      //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      //     children: [
-      //       Text(
-      //         'You have opened the app $appCounter times.',
-      //         style: const TextStyle(fontSize: 18),
-      //       ),
-      //       ElevatedButton(
-      //         onPressed: () {
-      //           deletePreference();
-      //         },
-      //         child: const Text('Reset Counter'),
-      //       ),
-      //     ],
-      //   ),
-      // ),
-      appBar: AppBar(title: const Text('Path Provider Ody')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text('Doc path: $documentsPath'),
-          Text('Temp path: $tempPath'),
-
-          ElevatedButton(onPressed: () => readFile(), child: Text('Read File')),
-          Text(fileText),
-        ],
+      appBar: AppBar(
+        title: const Text('Path Provider Ody'),
+        backgroundColor: Colors.deepPurple,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: pwdController,
+              decoration: const InputDecoration(
+                hintText: 'Super Secret String!',
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[300],
+                foregroundColor: Colors.black,
+              ),
+              onPressed: writeToSecureStorage,
+              child: const Text('Save Value'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[300],
+                foregroundColor: Colors.black,
+              ),
+              onPressed: readFromSecureStorage,
+              child: const Text('Read Value'),
+            ),
+            const SizedBox(height: 20),
+            Text(myPass),
+          ],
+        ),
       ),
     );
   }
