@@ -4,6 +4,7 @@ import 'model/pizza.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 void main() {
   runApp(const MyApp());
@@ -34,6 +35,8 @@ class _MyHomePageState extends State<MyHomePage> {
   int appCounter = 0; // Default 0
   String documentsPath = '';
   String tempPath = '';
+  late File myFile;
+  String fileText = '';
 
   Future<List<Pizza>> readJsonFile() async {
     String myString = await DefaultAssetBundle.of(
@@ -107,11 +110,35 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<bool> writeFile() async {
+    try {
+      await myFile.writeAsString('Margherita, Capricciosa, Napoli');
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> readFile() async {
+    try {
+      String fileContent = await myFile.readAsString();
+      setState(() {
+        fileText = fileContent;
+      });
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   void initState() {
+    getPaths().then((_) {
+      myFile = File('$documentsPath/pizzas.txt');
+      writeFile();
+    });
     super.initState();
     // readAndWritePreference();
-    getPaths();
 
     // Panggil fungsi JSON
     readJsonFile().then((value) {
@@ -148,6 +175,9 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Text('Doc path: $documentsPath'),
           Text('Temp path: $tempPath'),
+
+          ElevatedButton(onPressed: () => readFile(), child: Text('Read File')),
+          Text(fileText),
         ],
       ),
     );
