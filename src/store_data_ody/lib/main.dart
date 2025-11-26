@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'model/pizza.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,6 +32,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   List<Pizza> myPizzas = [];
   int appCounter = 0; // Default 0
+  String documentsPath = '';
+  String tempPath = '';
 
   Future<List<Pizza>> readJsonFile() async {
     String myString = await DefaultAssetBundle.of(
@@ -75,18 +79,44 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  // Run di android
+  // Future getPaths() async {
+  //   final docDir = await getApplicationDocumentsDirectory();
+  //   final tempDir = await getTemporaryDirectory();
+  //   setState(() {
+  //     documentsPath = docDir.path;
+  //     tempPath = tempDir.path;
+  //   });
+  // }
+
+  // Untuk di run di PC
+  Future getPaths() async {
+    if (kIsWeb) {
+      setState(() {
+        documentsPath = "Tidak tersedia di Web";
+        tempPath = "Tidak tersedia di Web";
+      });
+      return;
+    }
+
+    final docDir = await getApplicationDocumentsDirectory();
+    final tempDir = await getTemporaryDirectory();
+    setState(() {
+      documentsPath = docDir.path;
+      tempPath = tempDir.path;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-
-    // Panggil fungsi counter (Jalan sendiri update UI-nya)
-    readAndWritePreference();
+    // readAndWritePreference();
+    getPaths();
 
     // Panggil fungsi JSON
     readJsonFile().then((value) {
       setState(() {
         myPizzas = value;
-        // JANGAN update appCounter di sini, biarkan readAndWritePreference yang urus
       });
     });
   }
@@ -94,23 +124,31 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Shared Preferences ODY')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              'You have opened the app $appCounter times.',
-              style: const TextStyle(fontSize: 18),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                deletePreference();
-              },
-              child: const Text('Reset Counter'),
-            ),
-          ],
-        ),
+      // appBar: AppBar(title: const Text('Shared Preferences ODY')),
+      // body: Center(
+      //   child: Column(
+      //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      //     children: [
+      //       Text(
+      //         'You have opened the app $appCounter times.',
+      //         style: const TextStyle(fontSize: 18),
+      //       ),
+      //       ElevatedButton(
+      //         onPressed: () {
+      //           deletePreference();
+      //         },
+      //         child: const Text('Reset Counter'),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+      appBar: AppBar(title: const Text('Path Provider Ody')),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text('Doc path: $documentsPath'),
+          Text('Temp path: $tempPath'),
+        ],
       ),
     );
   }
