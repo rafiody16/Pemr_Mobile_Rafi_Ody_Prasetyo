@@ -610,7 +610,7 @@ Menangani navigasi dengan mengirim data Pizza.
 // ...
 ```
 
-![Screenshot Aplikasi](img/update.png)
+![Screenshot Aplikasi](img/edit.png)
 ![Screenshot Aplikasi](img/update_status.png)
 
 ---
