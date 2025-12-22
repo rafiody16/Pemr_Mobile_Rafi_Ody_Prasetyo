@@ -470,7 +470,7 @@ Menambahkan `FloatingActionButton` untuk navigasi.
 ```
 
 ![Screenshot Aplikasi](img/post.png)
-![Screenshot Aplikasi](img/post status.png)
+![Screenshot Aplikasi](img/post_status.png)
 
 ---
 
@@ -611,7 +611,7 @@ Menangani navigasi dengan mengirim data Pizza.
 ```
 
 ![Screenshot Aplikasi](img/update.png)
-![Screenshot Aplikasi](img/update status.png)
+![Screenshot Aplikasi](img/update_status.png)
 
 ---
 
